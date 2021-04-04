@@ -26,7 +26,7 @@ const Profile = () => {
       {error ? (
         <h1>An error has occurred: {error.message}</h1>
       ) : user ? (
-        <h1>Your user id is {user.userId}</h1>
+        <h1>Your user id is: {user.userId}</h1>
       ) : (
         <h1>Loading...</h1>
       )}
