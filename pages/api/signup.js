@@ -35,7 +35,7 @@ export default async function signup(req, res) {
     )
 
     if (!loginRes.secret) {
-      throw new Error('No secret present in login query response.')
+      throw new Error('No secret present in login query response!')
     }
 
     const cookieSerialized = serializeFaunaCookie(loginRes.secret)
