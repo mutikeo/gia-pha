@@ -2,7 +2,7 @@ import Layout from '../components/layout'
 
 const Home = () => (
   <Layout>
-    <h1>Cookie-based authentication example</h1>
+    <h1>Cookie-based authentication example.</h1>
 
     <p>Steps to test the functionality:</p>
 
