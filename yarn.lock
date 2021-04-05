@@ -39,6 +39,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@balkangraph/orgchart.js@^7.7.30":
+  version "7.7.30"
+  resolved "https://registry.yarnpkg.com/@balkangraph/orgchart.js/-/orgchart.js-7.7.30.tgz#7386dacf8dd862bd0bb6ea54089f272dd30fe019"
+  integrity sha512-xLkrLPdyQ6j3qDM9cwDAJB3mS88+c9qboh/792zqf2AIJnUw8XCmszg+1h4W/uwYW2stp1geE04umwBgsul+yw==
+
 "@hapi/accept@5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-5.0.1.tgz#068553e867f0f63225a506ed74e899441af53e10"
