@@ -1,22 +1,21 @@
-import Layout from '../components/layout'
+import Layout from '../components/layout';
+import dynamic from 'next/dynamic';
+
+const MyChart = dynamic(
+  () => import('../components/mychart'),
+   { ssr: false }
+);
 
 const Home = () => (
   <Layout>
-    <h1>Cookie-based authentication example.</h1>
+    <div style={{ height: '100%' }}>
 
-    <p>Steps to test the functionality:</p>
+      <MyChart nodes={
+        [{ id: 1, name: "Name1", title: "Tytle1" },
+        { id: 2, pid: 1, name: "Name2", title: "Tytle2" },
+        { id: 3, pid: 1, name: "Name3", title: "Tytle3" }]} />
 
-    <ol>
-      <li>Click signup and create an account, this will also log you in.</li>
-      <li>
-        Click home and click profile again, notice how your session is being
-        used through a token stored in a cookie.
-      </li>
-      <li>
-        Click logout and try to go to profile again. You'll get redirected to
-        the `/login` route.
-      </li>
-    </ol>
+    </div>
     <style jsx>{`
       li {
         margin-bottom: 0.5rem;
