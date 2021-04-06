@@ -6,12 +6,12 @@ export const login = ({ email }) => {
 }
 
 export const logout = async () => {
-  await fetch('/api/logout')
+  await fetch('/api/logout');
 
-  window.localStorage.setItem('logout', Date.now())
-  window.localStorage.removeItem('user')
+  window.localStorage.setItem('logout', Date.now());
+  window.localStorage.removeItem('user');
 
-  Router.push('/login')
+  Router.push('/login');
 }
 
 export const withAuthSync = (Component) => {
