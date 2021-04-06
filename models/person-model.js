@@ -13,6 +13,7 @@ export class PersonModel {
               doc: q.Get(q.Var("ref"))
             },
             {
+              id: q.Select(["ref", "id"], q.Var("doc"), null),
               name: q.Select(["data", "name"], q.Var("doc"), null),
               parentId: q.Select(["data", "parentId"], q.Var("doc"), null)
             }
