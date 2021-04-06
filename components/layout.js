@@ -4,7 +4,7 @@ import Header from './header'
 const Layout = (props) => (
   <>
     <Head>
-      <title>With Cookies</title>
+      <title>Gia phả</title>
     </Head>
     <style jsx global>{`
       *,

@@ -3,15 +3,7 @@ import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { withAuthSync } from '../utils/auth'
 import Layout from '../components/layout'
-
-const fetcher = (url) =>
-  fetch(url).then((res) => {
-    if (res.status >= 300) {
-      throw new Error('API Client error')
-    }
-
-    return res.json()
-  })
+import { fetcher } from '../utils/auth'
 
 const Profile = () => {
   const router = useRouter()

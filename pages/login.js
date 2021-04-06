@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Router from 'next/router'
 import Layout from '../components/layout'
+import { store } from '../components/store';
 
 const signin = async (email, password) => {
   const response = await fetch('/api/login', {
@@ -13,10 +14,11 @@ const signin = async (email, password) => {
     throw new Error(await response.text())
   }
 
-  Router.push('/profile')
+  Router.push('/');
 }
 
 function Login() {
+  const { dispatch } = useContext(store)
   const [userData, setUserData] = useState({
     email: '',
     password: '',
@@ -31,7 +33,9 @@ function Login() {
     const password = userData.password
 
     try {
-      await signin(email, password)
+      await signin(email, password);
+      dispatch({ type: 'SET_PROFILE', user: email })
+      window.localStorage.setItem('user', email);
     } catch (error) {
       console.error(error)
       setUserData({ ...userData, error: error.message })

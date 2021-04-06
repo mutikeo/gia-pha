@@ -9,6 +9,7 @@ export const logout = async () => {
   await fetch('/api/logout')
 
   window.localStorage.setItem('logout', Date.now())
+  window.localStorage.removeItem('user')
 
   Router.push('/login')
 }
@@ -36,3 +37,12 @@ export const withAuthSync = (Component) => {
 
   return Wrapper
 }
+
+export const fetcher = (url) =>
+fetch(url).then((res) => {
+  if (res.status >= 300) {
+    throw new Error('API Client error')
+  }
+
+  return res.json()
+})
