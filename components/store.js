@@ -10,11 +10,15 @@ const StateProvider = ({ children }) => {
   const [state, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_PROFILE':
-        const newState = {
+        return {
           ...state,
           user: action.user
         };
-        return newState;
+      case 'RESTRUCTOR_PEOPLE':
+        return {
+          ...state,
+          people: action.people
+        };
       default:
         throw new Error();
     };

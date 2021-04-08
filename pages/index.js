@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '../components/layout';
 import dynamic from 'next/dynamic';
+import { demoConfig } from '../utils/demo';
 
 const MyChart = dynamic(
   () => import('../components/mychart'),
@@ -10,12 +11,7 @@ const MyChart = dynamic(
 const Home = () => (
   <Layout>
     <div style={{ height: '100%' }}>
-
-      <MyChart nodes={
-        [{ id: 1, name: "Name1", title: "Tytle1" },
-        { id: 2, pid: 1, name: "Name2", title: "Tytle2" },
-        { id: 3, pid: 1, name: "Name3", title: "Tytle3" }]} />
-
+      <MyChart nodes={demoConfig} />
     </div>
     <style jsx>{`
       li {

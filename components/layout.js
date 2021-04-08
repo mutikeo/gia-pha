@@ -22,10 +22,9 @@ const Layout = (props) => (
       }
 
       .container {
-        max-width: 65rem;
-        margin: 1.5rem auto;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        margin: 0 auto;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
       }
     `}</style>
     <Header />
