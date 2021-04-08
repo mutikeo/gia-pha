@@ -26,6 +26,15 @@ const Layout = (props) => (
         padding-left: 0.5rem;
         padding-right: 0.5rem;
       }
+      .loading-loader {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        background: rgba(255, 255, 255, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
     `}</style>
     <Header />
 
