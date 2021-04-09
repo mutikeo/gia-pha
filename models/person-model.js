@@ -15,7 +15,10 @@ export class PersonModel {
             {
               id: q.Select(["ref", "id"], q.Var("doc"), null),
               name: q.Select(["data", "name"], q.Var("doc"), null),
-              parentId: q.Select(["data", "parentId"], q.Var("doc"), null)
+              pid: q.Select(["data", "pid"], q.Var("doc"), null),
+              tags: q.Select(["data", "tags"], q.Var("doc"), null),
+              img: q.Select(["data", "img"], q.Var("doc"), null),
+              title: q.Select(["data", "title"], q.Var("doc"), null),
             }
           )
         )

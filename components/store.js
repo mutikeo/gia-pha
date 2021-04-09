@@ -14,7 +14,7 @@ const StateProvider = ({ children }) => {
           ...state,
           user: action.user
         };
-      case 'RESTRUCTOR_PEOPLE':
+      case 'RESTRUCTURE_PEOPLE':
         return {
           ...state,
           people: action.people

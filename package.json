@@ -7,8 +7,10 @@
   },
   "dependencies": {
     "@balkangraph/orgchart.js": "^7.7.30",
+    "axios": "^0.21.1",
     "cookie": "^0.4.0",
     "faunadb": "2.10.0",
+    "lodash": "^4.17.21",
     "next": "latest",
     "nprogress": "^0.2.0",
     "react": "^16.8.6",
