@@ -1,14 +1,22 @@
 
 import { StateProvider } from '../components/store';
-import Router from 'next/router';
-import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
+import dynamic from 'next/dynamic';
 
-Router.onRouteChangeStart = () => NProgress.start();
-Router.onRouteChangeComplete = () => NProgress.done();
-Router.onRouteChangeError = () => NProgress.done();
+const TopProgressBar = dynamic(
+  () => {
+    return import("../components/TopProgressBar");
+  },
+  { ssr: false },
+);
 
 function MyApp({ Component, pageProps }) {
-  return <StateProvider><Component {...pageProps} /></StateProvider>
+  return (
+    <StateProvider>
+      <TopProgressBar />
+      <Component {...pageProps} />
+    </StateProvider>
+  )
 }
 
 export default MyApp

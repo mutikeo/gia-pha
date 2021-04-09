@@ -1,7 +1,9 @@
 import React, { createContext, useReducer } from 'react';
 
 const initialState = {
-  user: null
+  user: null,
+  people: [],
+  loading: false
 };
 const store = createContext(initialState);
 const { Provider } = store;
@@ -18,6 +20,11 @@ const StateProvider = ({ children }) => {
         return {
           ...state,
           people: action.people
+        };
+      case 'SET_LOADING':
+        return {
+          ...state,
+          loading: action.loading
         };
       default:
         throw new Error();

@@ -8,6 +8,8 @@
   "dependencies": {
     "@balkangraph/orgchart.js": "^7.7.30",
     "axios": "^0.21.1",
+    "@rpldy/upload-button": "^0.11.4",
+    "@rpldy/uploady": "^0.11.4",
     "cookie": "^0.4.0",
     "faunadb": "2.10.0",
     "lodash": "^4.17.21",
@@ -15,6 +17,7 @@
     "nprogress": "^0.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-loader-spinner": "^4.0.0",
     "swr": "0.2.3"
   },
   "license": "MIT"

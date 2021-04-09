@@ -3,6 +3,8 @@ import Link from 'next/link';
 import useSWR from 'swr';
 import { store } from './store';
 import { withAuthSync, fetcher, logout } from '../utils/auth';
+import Loader from 'react-loader-spinner';
+
 const Header = () => {
   const { state: storeState, dispatch } = useContext(store);
   const [mounted, setMounted] = useState(false);
@@ -22,7 +24,19 @@ const Header = () => {
   };
 
   return (
-    <header>
+    <>
+      {
+        storeState.loading &&
+        <Loader
+          type="Puff"
+          color="#00BFFF"
+          height={100}
+          width={100}
+          className="loading-loader"
+        /> 
+      }
+      
+      <header>
       <nav>
         <ul>
           {
@@ -58,7 +72,7 @@ const Header = () => {
             </>
           }
         </ul>
-      </nav>
+      </nav>    
       <style jsx>{`
         ul {
           display: flex;
@@ -87,6 +101,7 @@ const Header = () => {
         }
       `}</style>
     </header>
+    </>
   )
 };
 
