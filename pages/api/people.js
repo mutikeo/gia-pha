@@ -5,11 +5,11 @@ const handlers = {
   GET: async(req, res) => {
     const model = new PersonModel();
     const people = await model.getAllPeople()
-    res.status(200).json({ people })
+    res.status(200).json(people)
   }
 }
 
 export default function people(req, res) {
   const handler = createHandlers(handlers)
   return handler(req, res)
-} 
+}

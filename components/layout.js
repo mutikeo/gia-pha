@@ -1,5 +1,10 @@
-import Head from 'next/head'
-import Header from './header'
+import Head from 'next/head';
+import dynamic from 'next/dynamic';
+
+const Header = dynamic(
+  () => import('./header'),
+  { ssr: false }
+);
 
 const Layout = (props) => (
   <>

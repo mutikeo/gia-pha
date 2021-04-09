@@ -1,3 +1,5 @@
+// should be remove in short future
+
 export const demoConfig = [
   { id: "top-management", tags: ["top-management"] },
   { id: "hr-team", pid: "top-management", tags: ["hr-team", "department"], name: "HR department" },
