@@ -29,4 +29,12 @@ export class PersonModel {
       )
       .then((res) => res.data);
   }
+
+  async updatePerson(id, person) {
+    await serverClient.query(
+      q.Update(q.Ref(q.Collection('People'), id), {
+        data: person
+      })
+    )
+  }
 }
