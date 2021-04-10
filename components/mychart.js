@@ -8,6 +8,7 @@ import axios from 'axios';
 import get from 'lodash/get';
 
 // chart.search("c", ["Name", "Title"], ["Title"]);
+const defaultImg = 'http://res.cloudinary.com/dag3oozxe/image/upload/v1618065818/t2mor4mo9rrpi8jqdmx4.jpg';
 
 const MyChart = (props) => {
   const divRef = useRef();
@@ -35,8 +36,16 @@ const MyChart = (props) => {
 	});
 
   useEffect(() => {
-    const addManager = (nodeId) => {
-      chart.addNode({ id: OrgChart.randomId(), stpid: nodeId });
+    const addManager = async (nodeId) => {
+      const newNode = { id: OrgChart.randomId(), stpid: nodeId };
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+      const resp = await axios.post('/api/people', newNode);
+      const _id = get(resp, 'data.ref["@ref"].id');
+      chart.addNode({ ...newNode, _id });
+      if (!get(resp, 'data.done')) {
+        console.warn('Error while adding data from manager', resp);
+      }
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
     };
 
     if (storeState.user) {
@@ -101,19 +110,18 @@ const MyChart = (props) => {
 
     chart.on('add', async (sender, node) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
-      const resp = await axios.post('/api/people', node);
+      const resp = await axios.post('/api/people', { ...node, img: defaultImg });
       const _id = get(resp, 'data.ref["@ref"].id');
-      chart.updateNode({ ...node, _id });
+      chart.updateNode({ ...node, _id, img: defaultImg });
       if (!get(resp, 'data.done')) {
         console.warn('Error while adding data', resp);
       }
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
     });
 
-    chart.on('remove', async (sender, nodeId, { newPidsForIds, newStpidsForIds }) => {
+    chart.on('remove', async (sender, nodeId, { newPidsForIds = {}, newStpidsForIds = {} }) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
       const nodeRemoved = sender.get(nodeId);
-      console.log('newPidsAndStpidsForIds', newPidsAndStpidsForIds, nodeId);
       const result = await axios.delete(`/api/people?id=${nodeRemoved._id}`);
       if (!get(result, 'data.done')) {
         console.warn('Error while removing data');
