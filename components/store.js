@@ -3,7 +3,8 @@ import React, { createContext, useReducer } from 'react';
 const initialState = {
   user: null,
   people: [],
-  loading: false
+  loading: false,
+  uploading: false,
 };
 const store = createContext(initialState);
 const { Provider } = store;
@@ -25,6 +26,11 @@ const StateProvider = ({ children }) => {
         return {
           ...state,
           loading: action.loading
+        };
+      case 'SET_LOADING_UPLOAD':
+        return {
+          ...state,
+          uploading: action.loading
         };
       default:
         throw new Error();

@@ -46,3 +46,6 @@ fetch(url).then((res) => {
 
   return res.json()
 })
+
+export const CLOUD_NAME = 'dag3oozxe';
+export const UPLOAD_PRESET = 's6cssrjr';

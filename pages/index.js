@@ -5,9 +5,15 @@ import Layout from '../components/layout';
 import dynamic from 'next/dynamic';
 import { store } from '../components/store';
 import { pickBy } from 'lodash';
+import { CLOUD_NAME, UPLOAD_PRESET } from '../utils/auth';
 
 const MyChart = dynamic(
   () => import('../components/mychart'),
+  { ssr: false }
+);
+
+const Uploady = dynamic(
+  () => import('@rpldy/uploady'),
   { ssr: false }
 );
 
@@ -18,7 +24,6 @@ const Home = () => {
     const fetchData = async () => {
       const resp = await axios.get('/api/people');
       const people = get(resp, 'data').map(p => pickBy(p, (i) => i !== null && i !== undefined));
-      console.log('people', people);
       dispatch({ type: 'RESTRUCTURE_PEOPLE', people });
       dispatch({ type: 'SET_LOADING', loading: false });
     };
@@ -30,7 +35,16 @@ const Home = () => {
       <div style={{ height: '100%' }}>
         {
           !storeState.loading &&
-          <MyChart nodes={storeState.people} />
+          <Uploady
+            destination={{
+              url: `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+              params: {
+                upload_preset: UPLOAD_PRESET,
+              },
+            }}
+          >
+            <MyChart nodes={storeState.people} />
+          </Uploady>
         }
       </div>
       <style jsx>{`
@@ -39,7 +53,7 @@ const Home = () => {
         }
       `}</style>
     </Layout>
-    )
-  }
+  )
+}
 
 export default Home

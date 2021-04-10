@@ -1,10 +1,37 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import OrgChart from '@balkangraph/orgchart.js';
+import { useUploady, useItemFinishListener, useItemStartListener, useItemErrorListener } from "@rpldy/uploady";
 import { chartConfig } from '../utils/chartConfig';
+import { store } from './store';
+import Loader from 'react-loader-spinner';
+import axios from 'axios';
+
+// chart.search("c", ["Name", "Title"], ["Title"]);
 
 const MyChart = (props) => {
-
   const divRef = useRef();
+  const [inputFile, setInputFile] = useState(null);
+  const uploady = useUploady();
+  let chart = null;
+  const { dispatch, state: storeState } = useContext(store);
+
+  useItemStartListener((item) => {
+    dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+		console.log(`item ${item.id} started uploading`);
+	});
+
+	useItemFinishListener((item) => {
+		console.log(`item ${item.id} finished uploading, response was: `, item.uploadResponse);
+		if (item.uploadStatus === 200) {
+			dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+			inputFile.value = item.uploadResponse.data.url;
+		}
+	});
+
+	useItemErrorListener((item) => {
+		dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+		console.log(`item ${item.id} failed - `, item.uploadResponse);
+	});
 
   useEffect(() => {
 
@@ -14,18 +41,18 @@ const MyChart = (props) => {
 
     chartConfig.tags.department.nodeMenu.addManager.onClick = addManager;
 
-    const chart = new OrgChart(divRef.current, {
+    chart = new OrgChart(divRef.current, {
       nodes: props.nodes,
       ...chartConfig
     });
 
     // Drag & Drop functional
     chart.on('drop', function (sender, draggedNodeId, droppedNodeId) {
-      var draggedNode = sender.getNode(draggedNodeId);
-      var droppedNode = sender.getNode(droppedNodeId);
+      const draggedNode = sender.getNode(draggedNodeId);
+      const droppedNode = sender.getNode(droppedNodeId);
 
       if (droppedNode.tags.indexOf("department") != -1 && draggedNode.tags.indexOf("department") == -1) {
-        var draggedNodeData = sender.get(draggedNode.id);
+        const draggedNodeData = sender.get(draggedNode.id);
         draggedNodeData.pid = null;
         draggedNodeData.stpid = droppedNode.id;
         sender.updateNode(draggedNodeData);
@@ -33,20 +60,37 @@ const MyChart = (props) => {
       }
     });
 
-    // Edit fields
-    chart.editUI.on('field', function (sender, args) {
-      var isDeprtment = sender.node.tags.indexOf("department") != -1;
-      var deprtmentFileds = ["name"];
+    chart.on('update', function (sender, oldNode, newNode) {
+      console.log('update', sender, oldNode, newNode);
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+      const resp = axios.put(`/api/people?id=${newNode._id}`, newNode);
+      console.log('resp', resp);
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+    });
 
-      if (isDeprtment && deprtmentFileds.indexOf(args.name) == -1) {
-        return false;
-      }
+    chart.editUI.on('field', function(sender, args) {
+      if (args.name === '_id' || args.name === 'Add new field') return false;
+    });
+
+    chart.editUI.on('imageuploaded', function (sender, file, input) {
+      setInputFile(input);
+      uploady.upload(file);
     });
 
   }, []);
 
   return (
     <>
+      {
+        storeState.uploading &&
+        <Loader
+          type="Puff"
+          color="#00BFFF"
+          height={100}
+          width={100}
+          className="loading-loader"
+        />
+      }
       <div id="tree" ref={divRef}></div>
       <style>{`
         #tree {
