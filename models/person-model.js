@@ -37,4 +37,22 @@ export class PersonModel {
       })
     )
   }
+
+  async addPerson(person) {
+    return await serverClient.query(
+      q.Create(
+        q.Collection('People'),
+        { data: person }
+      )
+    ).then(res => res)
+    .catch((err) => console.error('Error: %s', err))
+  }
+
+  async removePerson(id) {
+    await serverClient.query(
+      q.Delete(q.Ref(q.Collection('People'), id))
+    )
+    .then((ret) => console.log('ret', ret))
+    .catch((err) => console.error('Error: %s', err, id))
+  }
 }

@@ -5,6 +5,7 @@ import { chartConfig } from '../utils/chartConfig';
 import { store } from './store';
 import Loader from 'react-loader-spinner';
 import axios from 'axios';
+import get from 'lodash/get';
 
 // chart.search("c", ["Name", "Title"], ["Title"]);
 
@@ -34,12 +35,41 @@ const MyChart = (props) => {
 	});
 
   useEffect(() => {
-
     const addManager = (nodeId) => {
       chart.addNode({ id: OrgChart.randomId(), stpid: nodeId });
     };
 
-    chartConfig.tags.department.nodeMenu.addManager.onClick = addManager;
+    if (storeState.user) {
+      chartConfig.nodeMenu = {
+        details: { text: 'Xem' },
+        edit: { text: 'Sửa' },
+        add: { text: 'Thêm' },
+        remove: { text: 'Xóa' }
+      };
+
+      chartConfig.tags = {
+        ...chartConfig.tags,
+        'menu-without-add': {
+          nodeMenu: {
+            details: { text: 'Chi tiết' },
+            edit: { text: 'Sửa' },
+            remove: { text: 'Xóa' }
+          }
+        },
+        'department': {
+          template: 'group',
+          nodeMenu: {
+            addManager: { text: 'Add new manager', icon: OrgChart.icon.add(24, 24, '#7A7A7A'), onClick: addManager },
+            remove: { text: 'Remove department' },
+            edit: { text: 'Edit department' },
+          }
+        }
+      }
+    } else {
+      delete chartConfig.nodeMenu;
+      delete chartConfig.tags['menu-without-add'];
+      delete chartConfig.tags.department.nodeMenu;
+    }
 
     chart = new OrgChart(divRef.current, {
       nodes: props.nodes,
@@ -47,7 +77,7 @@ const MyChart = (props) => {
     });
 
     // Drag & Drop functional
-    chart.on('drop', function (sender, draggedNodeId, droppedNodeId) {
+    chart.on('drop', (sender, draggedNodeId, droppedNodeId) => {
       const draggedNode = sender.getNode(draggedNodeId);
       const droppedNode = sender.getNode(droppedNodeId);
 
@@ -60,23 +90,63 @@ const MyChart = (props) => {
       }
     });
 
-    chart.on('update', function (sender, oldNode, newNode) {
-      console.log('update', sender, oldNode, newNode);
+    chart.on('update', async (sender, oldNode, newNode) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
-      const resp = axios.put(`/api/people?id=${newNode._id}`, newNode);
-      console.log('resp', resp);
+      const resp = await axios.put(`/api/people?id=${newNode._id}`, newNode)
+      if (!get(resp, 'data.done')) {
+        console.warn('Error while updating data', newNode._id);
+      }
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
     });
 
-    chart.editUI.on('field', function(sender, args) {
+    chart.on('add', async (sender, node) => {
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+      const resp = await axios.post('/api/people', node);
+      const _id = get(resp, 'data.ref["@ref"].id');
+      chart.updateNode({ ...node, _id });
+      if (!get(resp, 'data.done')) {
+        console.warn('Error while adding data', resp);
+      }
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+    });
+
+    chart.on('remove', async (sender, nodeId, { newPidsForIds, newStpidsForIds }) => {
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+      const nodeRemoved = sender.get(nodeId);
+      console.log('newPidsAndStpidsForIds', newPidsAndStpidsForIds, nodeId);
+      const result = await axios.delete(`/api/people?id=${nodeRemoved._id}`);
+      if (!get(result, 'data.done')) {
+        console.warn('Error while removing data');
+      } else {
+        // set new position for children of the removed node
+        for (const id in newPidsForIds) {
+          const nodeUpdated = sender.get(id);
+          nodeUpdated.pids = newPidsForIds[id];
+          await axios.put(`/api/people?id=${nodeUpdated._id}`, nodeUpdated);
+        }
+
+        for (const id in newStpidsForIds) {
+          const nodeUpdated = sender.get(id);
+          nodeUpdated.stpid = newPidsForIds[id];
+          await axios.put(`/api/people?id=${nodeUpdated._id}`, nodeUpdated);
+        }
+
+      }
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+    });
+
+    chart.editUI.on('field', (sender, args) => {
       if (args.name === '_id' || args.name === 'Add new field') return false;
     });
 
-    chart.editUI.on('imageuploaded', function (sender, file, input) {
+    chart.editUI.on('imageuploaded',  (sender, file, input) => {
       setInputFile(input);
       uploady.upload(file);
     });
 
+    return () => {
+      chart.destroy();
+    }
   }, []);
 
   return (

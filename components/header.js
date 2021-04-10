@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Link from 'next/link';
-import useSWR from 'swr';
 import { store } from './store';
-import { withAuthSync, fetcher, logout } from '../utils/auth';
+import { logout } from '../utils/auth';
 import Loader from 'react-loader-spinner';
 
 import { fade, makeStyles } from '@material-ui/core/styles';
@@ -10,11 +9,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import PersonAdd from '@material-ui/icons/PersonAdd';
-import DoubleArrow from '@material-ui/icons/DoubleArrow';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import Home from '@material-ui/icons/Home';
 
 const useStyles = makeStyles((theme) => ({
@@ -86,18 +83,13 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = () => {
   const { state: storeState, dispatch } = useContext(store);
-  const [mounted, setMounted] = useState(false);
-  const { data: userSv } = useSWR(mounted ? '/api/profile' : '', fetcher);
 
   const classes = useStyles();
 
   useEffect(() => {
     const user = window.localStorage.getItem('user');
-    setMounted(true);
-    if (userSv) {
-      dispatch({ type: 'SET_PROFILE', user: user });
-    }
-  }, [userSv]);
+    dispatch({ type: 'SET_PROFILE', user });
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -122,19 +114,6 @@ const Header = () => {
             <Typography className={classes.title} variant="h6" noWrap>
               TRẦN KHẮC CHI III
             </Typography>
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <SearchIcon />
-              </div>
-              <InputBase
-                placeholder="Tìm kiếm..."
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </div>
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
               <IconButton color="inherit">
@@ -146,7 +125,7 @@ const Header = () => {
                   !storeState.user &&
                   <IconButton color="inherit">
                     <Link href="/login">
-                      <DoubleArrow />
+                      <AccountCircle />
                     </Link>
                   </IconButton>
                 }
@@ -180,4 +159,4 @@ const Header = () => {
   )
 };
 
-export default React.memo(withAuthSync(Header));
+export default React.memo(Header);

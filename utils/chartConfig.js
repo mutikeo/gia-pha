@@ -4,12 +4,6 @@ export const chartConfig = {
   template: 'mila',
   enableDragDrop: true,
   assistantSeparation: 170,
-  nodeMenu: {
-    details: { text: 'Chi tiết' },
-    edit: { text: 'Sửa' },
-    add: { text: 'Thêm' },
-    remove: { text: 'Xóa' }
-  },
   align: OrgChart.ORIENTATION,
   toolbar: {
     fullScreen: true,
@@ -56,20 +50,8 @@ export const chartConfig = {
         }
       },
     },
-    'menu-without-add': {
-      nodeMenu: {
-        details: { text: 'Chi tiết' },
-        edit: { text: 'Sửa' },
-        remove: { text: 'Xóa' }
-      }
-    },
     'department': {
       template: 'group',
-      nodeMenu: {
-        addManager: { text: 'Add new manager', icon: OrgChart.icon.add(24, 24, '#7A7A7A') },
-        remove: { text: 'Remove department' },
-        edit: { text: 'Edit department' },
-      }
     }
   }
 };
