@@ -8,6 +8,7 @@ const handlers = {
     res.status(200).json(people)
   },
   /** Update a person's info
+   * 
    * @address `/api/people?id=${id}`
    * @param {string} id - person's id
    * @body {Object} - person's data
@@ -19,6 +20,7 @@ const handlers = {
     res.status(200).json({ done: true })
   },
   /** Add a new person
+   * 
    * @address `/api/people`
    * @method POST
    * @body {Object} - person's data
@@ -29,7 +31,8 @@ const handlers = {
     const newPerson = await model.addPerson(person);
     res.status(200).json({ ...newPerson, done: true });
   },
-  /** Add a new person
+  /** Delete a person
+   * 
    * @address `/api/people?id=${id}`
    * @method DELETE
    * @param {string} id - person's id

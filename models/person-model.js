@@ -8,26 +8,12 @@ export class PersonModel {
         q.Map(
           q.Paginate(q.Match(q.Index("all_peoples"))),
           q.Lambda(
-            "ref",
-            q.Let(
-              {
-                doc: q.Get(q.Var("ref")),
-              },
-              {
-                _id: q.Select(["ref", "id"], q.Var("doc"), null),
-                id: q.Select(["data", "id"], q.Var("doc"), null),
-                name: q.Select(["data", "name"], q.Var("doc"), null),
-                pid: q.Select(["data", "pid"], q.Var("doc"), null),
-                tags: q.Select(["data", "tags"], q.Var("doc"), null),
-                img: q.Select(["data", "img"], q.Var("doc"), null),
-                title: q.Select(["data", "title"], q.Var("doc"), null),
-                stpid: q.Select(["data", "stpid"], q.Var("doc"), null),
-              }
-            )
+            "X", q.Get(q.Var("X"))
           )
         )
       )
-      .then((res) => res.data);
+      .then(res => res.data.map(p => p.data))
+      .catch((err) => console.error('Error: %s', err))
   }
 
   async updatePerson(id, person) {
@@ -36,6 +22,8 @@ export class PersonModel {
         data: person
       })
     )
+    .then(res => res)
+    .catch((err) => console.error('Error: %s', err))
   }
 
   async addPerson(person) {
@@ -44,7 +32,8 @@ export class PersonModel {
         q.Collection('People'),
         { data: person }
       )
-    ).then(res => res)
+    )
+    .then(res => res)
     .catch((err) => console.error('Error: %s', err))
   }
 
