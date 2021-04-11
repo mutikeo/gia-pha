@@ -18,7 +18,7 @@ export class PersonModel {
 
   async updatePerson(id, person) {
     await serverClient.query(
-      q.Update(q.Ref(q.Collection('People'), id), {
+      q.Replace(q.Ref(q.Collection('People'), id), {
         data: person
       })
     )

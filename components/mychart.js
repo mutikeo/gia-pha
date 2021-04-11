@@ -15,6 +15,8 @@ const GENDER_TAGS = {
   'Nữ': 'woman'
 };
 
+const defaultNode = { "Hình ảnh": defaultImg, [GENDER]: 'Nam', tags: ['man'] };
+
 const MyChart = (props) => {
   const divRef = useRef();
   const [inputFile, setInputFile] = useState(null);
@@ -46,12 +48,17 @@ const MyChart = (props) => {
         details: { text: 'Xem' },
         edit: { text: 'Sửa' },
         add: { text: 'Thêm' },
-        remove: { text: 'Xóa' }
+        remove: { text: 'Xóa' },
+        addParent: {
+          icon: OrgChart.icon.add(16,16,"#ace"),
+          text: "Thêm cha",
+          onClick: addParentHandler
+        }
       };
 
       chartConfig.tags = {
         ...chartConfig.tags,
-        'woman': {
+        woman: {
           ...chartConfig.tags.woman,
           nodeMenu: {
             details: { text: 'Chi tiết' },
@@ -62,7 +69,6 @@ const MyChart = (props) => {
       }
     } else {
       delete chartConfig.nodeMenu;
-      delete chartConfig.tags['menu-without-add'];
     }
 
     chart = new OrgChart(divRef.current, {
@@ -70,25 +76,49 @@ const MyChart = (props) => {
       ...chartConfig
     });
 
-    // Drag & Drop functional
-    chart.on('drop', (sender, draggedNodeId, droppedNodeId) => {
-      const draggedNode = sender.getNode(draggedNodeId);
-      const droppedNode = sender.getNode(droppedNodeId);
-
-      if (droppedNode.tags.indexOf("department") != -1 && draggedNode.tags.indexOf("department") == -1) {
-        const draggedNodeData = sender.get(draggedNode.id);
-        draggedNodeData.pid = null;
-        draggedNodeData.stpid = droppedNode.id;
-        sender.updateNode(draggedNodeData);
-        return false;
+    function addParentHandler (nodeId) {
+      const nodeData = chart.get(nodeId);
+      if (nodeData.pid) {
+        console.error('The parent already exist!');
+        return;
       }
-    });
+
+      dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+      const node = { ...defaultNode, id: OrgChart.randomId() };
+      axios.post('/api/people', node).then(async res => {
+        const _id = get(res, 'data.ref["@ref"].id');
+        await axios.put(`/api/people?id=${_id}`, { ...node, _id });
+        const resp = await axios.put(`/api/people?id=${nodeData._id}`, { ...nodeData, pid: node.id });
+        if (!get(resp, 'data.done')) {
+          console.warn('Error while updating data', newNode._id);
+        }
+
+        chart.addNode({ ...node, _id });
+        chart.updateNode({ ...nodeData, pid: node.id });
+        dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+      }).catch(err => {
+        console.error(err);
+        dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
+      });
+    };
+
+    // Drag & Drop functional
+    // chart.on('drop', (sender, draggedNodeId, droppedNodeId) => {
+    //   const draggedNode = sender.getNode(draggedNodeId);
+    //   const droppedNode = sender.getNode(droppedNodeId);
+    //   const draggedNodeData = sender.get(draggedNode.id);
+    //   draggedNodeData.pid = null;
+    //   draggedNodeData.stpid = droppedNode.id;
+    //   sender.updateNode(draggedNodeData);
+    //   return false;
+    // });
 
     chart.on('update', async (sender, oldNode, newNode) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
       // tags = [ "man/woman" ]
       newNode.tags = [GENDER_TAGS[newNode[GENDER]]];
-      const resp = await axios.put(`/api/people?id=${newNode._id}`, newNode)
+      delete newNode.order;
+      const resp = await axios.put(`/api/people?id=${newNode._id}`, newNode);
       if (!get(resp, 'data.done')) {
         console.warn('Error while updating data', newNode._id);
       }
@@ -97,9 +127,9 @@ const MyChart = (props) => {
 
     chart.on('add', async (sender, node) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
-      const resp = await axios.post('/api/people', { ...node, img: defaultImg, [GENDER]: 'Nam', tags: ['man'] });
+      const resp = await axios.post('/api/people', { ...node, ...defaultNode });
       const _id = get(resp, 'data.ref["@ref"].id');
-      chart.updateNode({ ...node, _id, img: defaultImg, [GENDER]: 'Nam', tags: ['man'] });
+      chart.updateNode({ ...node, ...defaultNode, _id });
       if (!get(resp, 'data.done')) {
         console.warn('Error while adding data', resp);
       }

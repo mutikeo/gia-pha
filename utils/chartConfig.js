@@ -2,7 +2,7 @@ import OrgChart from '@balkangraph/orgchart.js';
 
 export const chartConfig = {
   template: 'mila',
-  enableDragDrop: true,
+  enableDragDrop: false,
   assistantSeparation: 170,
   scaleInitial: OrgChart.match.boundary,
   align: OrgChart.ORIENTATION,
@@ -19,9 +19,9 @@ export const chartConfig = {
     expandAll: true
   },
   nodeBinding: {
-    field_0: 'name',
-    field_1: 'title',
-    img_0: 'img'
+    field_0: 'Họ và tên',
+    field_1: 'NS-NM',
+    img_0: 'Hình ảnh'
   },
   tags: {
     woman: {
