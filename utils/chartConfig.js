@@ -4,7 +4,14 @@ export const chartConfig = {
   template: 'mila',
   enableDragDrop: true,
   assistantSeparation: 170,
+  scaleInitial: OrgChart.match.boundary,
   align: OrgChart.ORIENTATION,
+  orderBy: {
+    field: "Con thứ"
+  },
+  collapse: {
+    level: 2
+  },
   toolbar: {
     fullScreen: true,
     zoom: true,
@@ -17,41 +24,8 @@ export const chartConfig = {
     img_0: 'img'
   },
   tags: {
-    'top-management': {
-      template: 'invisibleGroup',
-      subTreeConfig: {
-        orientation: OrgChart.orientation.bottom,
-        collapse: {
-          level: 1
-        }
-      }
-    },
-    'it-team': {
-      subTreeConfig: {
-        layout: OrgChart.mixed,
-        collapse: {
-          level: 1
-        }
-      },
-    },
-    'hr-team': {
-      subTreeConfig: {
-        layout: OrgChart.treeRightOffset,
-        collapse: {
-          level: 1
-        }
-      },
-    },
-    'sales-team': {
-      subTreeConfig: {
-        layout: OrgChart.treeLeftOffset,
-        collapse: {
-          level: 1
-        }
-      },
-    },
-    'department': {
-      template: 'group',
+    woman: {
+      template: 'ana',
     }
   }
 };

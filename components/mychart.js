@@ -9,6 +9,11 @@ import get from 'lodash/get';
 
 // chart.search("c", ["Name", "Title"], ["Title"]);
 const defaultImg = 'http://res.cloudinary.com/dag3oozxe/image/upload/v1618065818/t2mor4mo9rrpi8jqdmx4.jpg';
+const GENDER = 'Giới tính';
+const GENDER_TAGS = {
+  'Nam': 'man',
+  'Nữ': 'woman'
+};
 
 const MyChart = (props) => {
   const divRef = useRef();
@@ -36,18 +41,6 @@ const MyChart = (props) => {
 	});
 
   useEffect(() => {
-    const addManager = async (nodeId) => {
-      const newNode = { id: OrgChart.randomId(), stpid: nodeId };
-      dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
-      const resp = await axios.post('/api/people', newNode);
-      const _id = get(resp, 'data.ref["@ref"].id');
-      chart.addNode({ ...newNode, _id });
-      if (!get(resp, 'data.done')) {
-        console.warn('Error while adding data from manager', resp);
-      }
-      dispatch({ type: 'SET_LOADING_UPLOAD', loading: false });
-    };
-
     if (storeState.user) {
       chartConfig.nodeMenu = {
         details: { text: 'Xem' },
@@ -58,26 +51,18 @@ const MyChart = (props) => {
 
       chartConfig.tags = {
         ...chartConfig.tags,
-        'menu-without-add': {
+        'woman': {
+          ...chartConfig.tags.woman,
           nodeMenu: {
             details: { text: 'Chi tiết' },
             edit: { text: 'Sửa' },
             remove: { text: 'Xóa' }
-          }
-        },
-        'department': {
-          template: 'group',
-          nodeMenu: {
-            addManager: { text: 'Add new manager', icon: OrgChart.icon.add(24, 24, '#7A7A7A'), onClick: addManager },
-            remove: { text: 'Remove department' },
-            edit: { text: 'Edit department' },
           }
         }
       }
     } else {
       delete chartConfig.nodeMenu;
       delete chartConfig.tags['menu-without-add'];
-      delete chartConfig.tags.department.nodeMenu;
     }
 
     chart = new OrgChart(divRef.current, {
@@ -101,6 +86,8 @@ const MyChart = (props) => {
 
     chart.on('update', async (sender, oldNode, newNode) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
+      // tags = [ "man/woman" ]
+      newNode.tags = [GENDER_TAGS[newNode[GENDER]]];
       const resp = await axios.put(`/api/people?id=${newNode._id}`, newNode)
       if (!get(resp, 'data.done')) {
         console.warn('Error while updating data', newNode._id);
@@ -110,9 +97,9 @@ const MyChart = (props) => {
 
     chart.on('add', async (sender, node) => {
       dispatch({ type: 'SET_LOADING_UPLOAD', loading: true });
-      const resp = await axios.post('/api/people', { ...node, img: defaultImg });
+      const resp = await axios.post('/api/people', { ...node, img: defaultImg, [GENDER]: 'Nam', tags: ['man'] });
       const _id = get(resp, 'data.ref["@ref"].id');
-      chart.updateNode({ ...node, _id, img: defaultImg });
+      chart.updateNode({ ...node, _id, img: defaultImg, [GENDER]: 'Nam', tags: ['man'] });
       if (!get(resp, 'data.done')) {
         console.warn('Error while adding data', resp);
       }
@@ -144,7 +131,29 @@ const MyChart = (props) => {
     });
 
     chart.editUI.on('field', (sender, args) => {
-      if (args.name === '_id' || args.name === 'Add new field') return false;
+      if (args.name === '_id' || args.name === 'pids') return false;
+
+      if (args.type == 'edit' && args.name == GENDER) {
+
+        const txt = args.field.querySelector('input');
+        const txtVal = txt.value;
+        if (txt) {
+            const select = document.createElement('select');
+            select.innerHTML = '<option value="Nam">Nam</option>'
+            + '<option value="Nữ">Nữ</option>';
+
+            select.style.width = '100%';
+            select.setAttribute('val', '');
+            select.style.fontSize = '16px';
+            select.style.color = 'rgb(122, 122, 122)';
+            select.style.paddingTop = '7px';
+            select.style.paddingBottom = '7px';
+            select.value = txtVal;
+
+            txt.parentNode.appendChild(select);
+            txt.parentNode.removeChild(txt);
+        }
+    }
     });
 
     chart.editUI.on('imageuploaded',  (sender, file, input) => {
@@ -176,51 +185,19 @@ const MyChart = (props) => {
           height: 100%;
         }
 
-        .it-team>rect {
-          fill: #b4ffff;
+        .woman>rect {
+          fill: #BF92D5;
         }
 
-        .it-team>text {
-          fill: #039BE5;
+        .woman>text {
+          fill: #fff;
         }
 
-        .it-team>[control-node-menu-id] line {
-          stroke: #039BE5;
-        }
-
-        .it-team>g>.ripple {
-          fill: #00efef;
-        }
-
-        .hr-team>rect {
-          fill: #fff5d8;
-        }
-
-        .hr-team>text {
-          fill: #ecaf00;
-        }
-
-        .hr-team>[control-node-menu-id] line {
-          stroke: #ecaf00;
-        }
-
-        .hr-team>g>.ripple {
-          fill: #ecaf00;
-        }
-
-        .sales-team>rect {
-          fill: #ffeedd;
-        }
-
-        .sales-team>text {
-          fill: #F57C00;
-        }
-
-        .sales-team>[control-node-menu-id] line {
+        .woman>[control-node-menu-id] line {
           stroke: #F57C00;
         }
 
-        .sales-team>g>.ripple {
+        .woman>g>.ripple {
           fill: #F57C00;
         }
       `}</style>
